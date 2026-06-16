@@ -68,7 +68,7 @@ function decksManifest() {
     name: "decks-manifest",
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        if ((req.url || "").split("?")[0] === "/decks.json") {
+        if ((req.url || "").split("?")[0].endsWith("/decks.json")) {
           res.setHeader("Content-Type", "application/json");
           res.end(JSON.stringify(buildManifest()));
           return;
@@ -86,6 +86,9 @@ function decksManifest() {
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // GitHub Pages serves the site under /flashr/, but local dev stays at the
+  // root so http://localhost:5173/ works directly.
+  base: command === "build" ? "/flashr/" : "/",
   plugins: [decksManifest()],
-});
+}));

@@ -163,7 +163,7 @@ async function countCards(units) {
       chapters.map(async (ch, ci) => {
         let n = 0;
         try {
-          const res = await fetch(`${import.meta.env.BASE_URL}${ch.file}`);
+          const res = await fetch(`${import.meta.env.BASE_URL}${encodeURI(ch.file)}`);
           if (res.ok) n = parseCards(await res.text()).cards.length;
         } catch {
           n = -1;
@@ -183,7 +183,7 @@ async function loadDeck(files, name) {
   try {
     const texts = await Promise.all(
       files.map(async (f) => {
-        const res = await fetch(`${import.meta.env.BASE_URL}${f}`);
+        const res = await fetch(`${import.meta.env.BASE_URL}${encodeURI(f)}`);
         if (!res.ok) throw new Error();
         return res.text();
       })
