@@ -20,6 +20,17 @@ function prettify(s) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+// Extract the first number from a string for sorting. Files without numbers
+// sort to the end (Infinity), so new unnumbered additions appear last.
+function numKey(s) {
+  const m = s.match(/\d+/);
+  return m ? parseInt(m[0], 10) : Infinity;
+}
+
+function numSort(a, b) {
+  return numKey(a) - numKey(b) || a.localeCompare(b);
+}
+
 function collectDecks(dir) {
   let out = [];
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -38,11 +49,11 @@ function buildManifest() {
   if (!fs.existsSync(PUBLIC_DIR)) return units;
 
   for (const e of fs.readdirSync(PUBLIC_DIR, { withFileTypes: true }).sort((a, b) =>
-    a.name.localeCompare(b.name)
+    numSort(a.name, b.name)
   )) {
     if (e.isDirectory()) {
       const files = collectDecks(path.join(PUBLIC_DIR, e.name)).sort((a, b) =>
-        a.localeCompare(b)
+        numSort(path.basename(a), path.basename(b))
       );
       if (!files.length) continue;
       units.push({
